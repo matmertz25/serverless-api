@@ -1,4 +1,4 @@
-# serverless
+# serverless samples
 
 Serverless CRUD Api on AWS implemented with Serverless Application Model (SAM)
 
