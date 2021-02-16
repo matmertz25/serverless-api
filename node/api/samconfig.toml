@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "serverless-api"
+s3_bucket = "cf-templates" 
+s3_prefix = "serverless-api"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+tags = "project=\"serverless-api\" env=\"production\""

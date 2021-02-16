@@ -115,6 +115,11 @@
                     "BackoffRate": 10
                 }
             ],
+            "Next": "Finish"
+        },
+        "Finish": {
+            "Type": "Pass",
+            "Result": "Hello",
             "End": true
         }
     }
