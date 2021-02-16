@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless Api SAM Template
+
+Parameters:
+  EnvType:
+    Type: String
+    Default: dev
+    Description: Environment type.
+    AllowedValues:
+      - prod
+      - dev
+    ConstraintDescription: must specify prod or dev.
+
+Conditions:
+  CreateProdResources: !Equals 
+    - !Ref EnvType
+    - prod
+
+Resources:
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: CreateProdResources
+    Properties: 
+      LogGroupName: /aws/apigateway/Api-Access-Logs
+      RetentionInDays: 30
+
+  CoreHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref EnvType
+      Description: 'My http api'
+      CorsConfiguration:
+        AllowHeaders: 
+          - '*'
+        AllowMethods:
+          - '*'
+        AllowOrigins:
+          - '*'
+      DefaultRouteSettings:
+        DataTraceEnabled: False
+        DetailedMetricsEnabled: False 
+        ThrottlingBurstLimit: 200
+      DisableExecuteApiEndpoint: False 
+      # Domain:
+      #   DomainName: test.io
+      #   CertificateArn: ''
+      #   EndpointConfiguration: REGIONAL
+        # Route53:
+        #   HostedZoneId: Z1PA6795UKMFR9
+      #   BasePath: 
+      #     - /
+      FailOnWarnings: True 
+      StageVariables: {
+        "APP_ENV": "DEV"
+      }
+      Tags: 
+        ENV: !Ref EnvType
+        APP: "Serverless"
+
+  ProjectFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: projects/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      FunctionName: Serverless-Project
+      Description: Serverless Projects API
+      Events:
+        ProjectBase:
+          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /projects
+            Method: Any
+            ApiId: !Ref CoreHttpApi
+
+  
